@@ -151,18 +151,19 @@ def handle_keys(game_object: Snake) -> None:
 
 
 def main():
-    """Главная функция цикла игры"""
+    """Главная функция цикла игры."""
     # Инициализация PyGame:
     pygame.init()
     # Тут нужно создать экземпляры классов.
     snake = Snake()
     apple = Apple()
+    # Основной цикл игры.
     while True:
         clock.tick(SPEED)
 
         handle_keys(snake)
         snake.move()
-
+        # Проверка находится ли голова на позиции яблока
         if snake.get_head_position() == apple.position:
             snake.length += 1
 
