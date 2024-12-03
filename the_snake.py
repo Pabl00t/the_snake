@@ -14,6 +14,7 @@ DOWN = (0, 1)
 LEFT = (-1, 0)
 RIGHT = (1, 0)
 
+
 # Цвет фона - черный:
 BOARD_BACKGROUND_COLOR = (0, 0, 0)
 
@@ -33,7 +34,7 @@ SPEED = 15
 screen = pg.display.set_mode((SCREEN_WIDTH, SCREEN_HEIGHT), 0, 32)
 
 # Заголовок окна игрового поля:
-pg.display.set_caption('Змейка')
+pg.display.set_caption("Змейка")
 
 # Настройка времени:
 clock = pg.time.Clock()
@@ -54,10 +55,10 @@ class GameObject:
 class Apple(GameObject):
     """Класс объекта яблоко."""
 
-    def __init__(self):
+    def __init__(self, occupied_pozitions: list[Tuple[int, int]]):
         super().__init__()
         self.body_color = APPLE_COLOR
-        self.randomize_position([])
+        self.randomize_position(occupied_pozitions)
 
     def draw(self):
         """Отрисовка объекта яблоко на поле игры."""
@@ -94,17 +95,13 @@ class Snake(GameObject):
             self.direction = self.next_direction
             self.next_direction = None
 
-    def new_head(self):
-        x, y = self.get_head_position()
-        return (
-            (self.direction[0] + (x * GRID_SIZE)) % SCREEN_WIDTH,
-            (self.direction[1] + (y * GRID_SIZE)) % SCREEN_HEIGHT,
-        )
-
-    def move(self, new_head: Tuple[int, int]) -> None:
+    def move(self) -> None:
         """Обработка движения змейки."""
+        self.update_direction()
+        new_head = self.current_position_head()
         self.positions.insert(0, new_head)
-        self.last = self.positions.pop()
+        if len(self.positions) > self.length:
+            self.positions.pop()
 
     def draw(self):
         """Отрисовка змейки на поле игры."""
@@ -112,6 +109,16 @@ class Snake(GameObject):
             rect = pg.Rect(position, (GRID_SIZE, GRID_SIZE))
             pg.draw.rect(screen, self.body_color, rect)
             pg.draw.rect(screen, BORDER_COLOR, rect, 1)
+
+    def current_position_head(self):
+        """Получаем точное положение головы."""
+        cur_head = self.get_head_position()
+        x, y = self.direction
+        new_head = (
+            (cur_head[0] + (x * GRID_SIZE)) % SCREEN_WIDTH,
+            (cur_head[1] + (y * GRID_SIZE)) % SCREEN_HEIGHT,
+        )
+        return new_head
 
     def get_head_position(self):
         """Получение позиции головы."""
@@ -126,12 +133,12 @@ class Snake(GameObject):
 
 
 def handle_keys(game_object: Snake) -> None:
-    """Обработка нажатий клавиш"""
+    """Обработка нажатий клавиш."""
     for event in pg.event.get():
         if event.type == pg.QUIT:
             pg.quit()
             raise SystemExit
-        if event.type == pg.KEYDOWN:
+        elif event.type == pg.KEYDOWN:
             if event.key == pg.K_UP and game_object.direction != DOWN:
                 game_object.next_direction = UP
             elif event.key == pg.K_DOWN and game_object.direction != UP:
@@ -148,20 +155,18 @@ def main():
     pg.init()
     # Тут нужно создать экземпляры классов.
     snake = Snake()
-    apple = Apple()
+    apple = Apple(snake.positions)
     # Основной цикл игры.
     while True:
         clock.tick(SPEED)
 
         handle_keys(snake)
-        snake.new_head()
+        snake.move()
 
-        # Проверка находится ли голова на позиции яблока
         if snake.get_head_position() == apple.position:
             snake.length += 1
             apple.randomize_position(snake.positions)
 
-        # Проверка столкновения змейки с самой собой
         if (
             len(snake.positions) > 2
             and snake.get_head_position() in snake.positions[2:]
@@ -175,5 +180,5 @@ def main():
         pg.display.update()
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     main()
