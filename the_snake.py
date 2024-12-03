@@ -55,10 +55,10 @@ class GameObject:
 class Apple(GameObject):
     """Класс объекта яблоко."""
 
-    def __init__(self, occupied_pozitions: list[Tuple[int, int]]):
+    def __init__(self, occupied_positions: List[Tuple[int, int]] = list()):
         super().__init__()
         self.body_color = APPLE_COLOR
-        self.randomize_position(occupied_pozitions)
+        self.randomize_position(occupied_positions)
 
     def draw(self):
         """Отрисовка объекта яблоко на поле игры."""
