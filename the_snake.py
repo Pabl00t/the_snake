@@ -58,7 +58,8 @@ class Apple(GameObject):
 
     def __init__(self, occupied_positions: List[Tuple[int, int]] = None):
         super().__init__()
-        occupied_positions = []
+        if occupied_positions is None:
+            occupied_positions = []
         self.body_color = APPLE_COLOR
         self.randomize_position(occupied_positions)
 
