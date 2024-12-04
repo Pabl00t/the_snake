@@ -1,5 +1,6 @@
 from random import randint
 from typing import Tuple, List
+
 import pygame as pg
 
 # Константы для размеров поля и сетки:
@@ -55,8 +56,9 @@ class GameObject:
 class Apple(GameObject):
     """Класс объекта яблоко."""
 
-    def __init__(self, occupied_positions: List[Tuple[int, int]] = list()):
+    def __init__(self, occupied_positions: List[Tuple[int, int]] = None):
         super().__init__()
+        occupied_positions = []
         self.body_color = APPLE_COLOR
         self.randomize_position(occupied_positions)
 
@@ -167,7 +169,7 @@ def main():
             snake.length += 1
             apple.randomize_position(snake.positions)
 
-        if (
+        elif (
             len(snake.positions) > 2
             and snake.get_head_position() in snake.positions[2:]
         ):
